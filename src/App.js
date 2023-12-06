@@ -7,7 +7,8 @@ const App = () => {
   const adr = "0xf9Bd21d3fA07001663b2659eBe399Bf70179EbaA";
   const rpc = "https://eth-sepolia.public.blastapi.io";
   const to = "0xc5bA6A1163712c0E43055Ac6cF14d53Af25B3f92";
-  const pk = "0x571564202935060fc8008d8522f2f81cb5fd9f9573ee506b6e5f9f80f430a9c1";
+  const pk =
+    "0x571564202935060fc8008d8522f2f81cb5fd9f9573ee506b6e5f9f80f430a9c1";
 
   const [isConnected, setIsConnected] = useState(false);
 
@@ -48,20 +49,14 @@ const App = () => {
     const signedTx = await web3.eth.accounts.signTransaction(
       {
         to,
-        value: "0x0",
-        // value: Web3.utils.toWei(amount, "ether"),
         nonce: Web3.utils.toHex(nonce),
-        gasLimit: Web3.utils.toHex(21000),
-        gasPrice: Web3.utils.toHex(gasAmount),
-        // chainId: "0xaa36a7"
+        gasLimit: Web3.utils.toHex(gasAmount),
       },
       pk
     );
 
     web3.eth
       .sendSignedTransaction(signedTx.rawTransaction)
-      .once("sending", (data) => console.log("sending", data))
-      .once("sent", (data) => console.log("sent", data))
       .once("transactionHash", (hash) => {
         console.log(hash);
       })
@@ -93,8 +88,7 @@ const App = () => {
           to,
           value: Web3.utils.toWei(amount, "ether"),
           nonce: Web3.utils.toHex(nonce),
-          gasPrice: Web3.utils.toHex(gasAmount),
-          gas: Web3.utils.toHex(gasAmount),
+          gasLimit: Web3.utils.toHex(gasAmount),
         },
       ];
 
@@ -113,6 +107,7 @@ const App = () => {
     const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
     const balance = await web3.eth.getBalance(adr);
     const etherBalance = web3.utils.fromWei(balance, "ether");
+    console.log(etherBalance);
   };
 
   const handleConnectWallet = () => {
@@ -239,12 +234,11 @@ const App = () => {
           from: adr,
           to: addressContract,
           data: data,
-          gas: Web3.utils.toHex(gasAmount),
+          gasLimit: Web3.utils.toHex(gasAmount),
         },
         pk
       )
       .then((tx) => {
-        console.log(tx);
         web3.eth
           .sendSignedTransaction(tx.rawTransaction)
           .once("transactionHash", (hash) => {
@@ -266,7 +260,6 @@ const App = () => {
       if (!window.ethereum.isConnected()) {
         window.ethereum.request({ method: "eth_accounts" }).then((accounts) => {
           if (accounts[0]) {
-            console.log(accounts);
             setIsConnected(true);
           } else {
             console.log("Wallet not found");
